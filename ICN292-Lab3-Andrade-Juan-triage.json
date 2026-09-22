@@ -1,0 +1,526 @@
+{
+  "name": "ICN292-Lab3-Andrade-Juan-triage",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Triage devoluciones",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fc638930-9057-45f5-ab91-c88295ae462b",
+      "name": "Webhook",
+      "webhookId": "b24dbca5-9220-489a-95c2-10e2c0ae1e7b"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body[0].id_solicitud }}",
+                    "rightValue": "=0",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "781d7929-09eb-4664-8313-1da1025ca338"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "INVALIDO_CAMPO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "69406c28-c860-471c-9356-115a18da90d8",
+                    "leftValue": "={{ $json.body[0].monto.toNumber() }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "INVALIDO_MONTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "162daf2d-62d3-4d58-a3a6-c2ff33533ce4",
+                    "leftValue": "={{ $json.body[0].dias_desde_compra.toNumber() }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RECHAZO_PLAZO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e7100a9e-871c-43df-bbe5-d73bdad49716",
+                    "leftValue": "={{ $json.body[0].estado_producto }}",
+                    "rightValue": "danado_por_uso",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RECHAZO_ESTADO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a0949ac0-9b33-41f5-a9e4-64ee314cdd8d",
+                    "leftValue": "={{ $json.body[0].monto.toNumber() }}",
+                    "rightValue": 50000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "REVISION_MONTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fffe72b5-f803-4b0f-b2e1-de7addcf334d",
+                    "leftValue": "={{ $json.body[0].estado_producto }}",
+                    "rightValue": "con_fallas",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "REVISION_FALLA"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra",
+          "allMatchingOutputs": false
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -80
+      ],
+      "id": "2057893e-f5f5-4e75-94f0-53fa3e80ffbd",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "349101de-cf62-4052-a26e-c654f22b1d15",
+              "name": "ruta",
+              "value": "Rechazo",
+              "type": "string"
+            },
+            {
+              "id": "e299e207-46b4-4e74-a260-b6f04f522ec9",
+              "name": "motivo",
+              "value": "Plazo excedido o producto dañado por uso",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        -64
+      ],
+      "id": "eaba2511-7e0b-41ad-99e7-d87b7175948e",
+      "name": "Rechazos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cdc35c56-72cf-4458-89f9-bc7ba929ab16",
+              "name": "ruta",
+              "value": "Datos Invalidos",
+              "type": "string"
+            },
+            {
+              "id": "02d7c662-b20a-49cf-a712-6870707acd1b",
+              "name": "motivo",
+              "value": "Campo faltante o monto menor igual a 0",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        -224
+      ],
+      "id": "08a97b82-31e1-47ca-889e-ad01ca2aabe4",
+      "name": "Inválidos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "63313bcf-5704-4773-b340-064155e5fb7a",
+              "name": "ruta",
+              "value": "Revisión",
+              "type": "string"
+            },
+            {
+              "id": "18d8b43c-66ce-4488-809f-5e41576e0449",
+              "name": "motivo",
+              "value": "Monto sobre 50000 o producto con fallas",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        80
+      ],
+      "id": "1c9f00c8-7c33-45f1-893d-d7c43af252d3",
+      "name": "Revisión"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dc3a4eaf-f125-4583-a5f3-e0305a581196",
+              "name": "ruta",
+              "value": "Aprobación",
+              "type": "string"
+            },
+            {
+              "id": "c790fade-6c6a-49c7-bb16-b7ba9ba47fa1",
+              "name": "motivo",
+              "value": "Cumple con  política de devolución",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        240
+      ],
+      "id": "3d3f2854-ac5f-4384-a17a-c711dd9fc765",
+      "name": "Aprobados"
+    },
+    {
+      "parameters": {
+        "url": "https://mindicador.cl/api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        -64
+      ],
+      "id": "6d7f0598-9535-4c4a-9eac-ba907f4a2805",
+      "name": "HTTP Request",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1280,
+        -64
+      ],
+      "id": "b9a572bb-4c70-4434-94e6-a71763605803",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f73556f1-fea7-4b31-9bc8-59a6d4c1c722",
+              "name": "monto uf",
+              "value": "={{ (Number($json.body[0].monto) / Number($('HTTP Request').item.json.uf.valor)).toFixed(2) }}",
+              "type": "string"
+            },
+            {
+              "id": "76dcdb08-cad5-405f-8cc5-49df8db5d4f3",
+              "name": "",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "cb245446-d44e-4027-9907-5520b1b0c83c",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1088,
+        -64
+      ],
+      "id": "113ecc76-e5ed-4150-b8a8-2c46203695f8",
+      "name": "Datos finales y UF"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Inválidos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inválidos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rechazos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rechazos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revisión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revisión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aprobados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inválidos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Datos finales y UF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechazos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisión": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aprobados": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datos finales y UF": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "2e1ad54d-728f-4cb7-88e2-e2c171fca80a",
+  "meta": {
+    "instanceId": "b2543e3aaed358bff05b07dd2aa648c867b7a11b7a2198b137502970b01fd223"
+  },
+  "nodeGroups": [],
+  "id": "EwkRwXl7mOUW4Vj3",
+  "tags": []
+}

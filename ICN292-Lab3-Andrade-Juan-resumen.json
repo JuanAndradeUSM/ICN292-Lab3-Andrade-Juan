@@ -1,0 +1,138 @@
+{
+  "name": "ICN292-Lab3-Andrade-Juan-resumen",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b0fc32a6-a0ec-4738-ba06-264699a922cd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id_solicitud",
+              "includeEmpty": ""
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "ruta",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "e79640ca-7be9-4076-975d-cf29551312b1",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { id_solicitud: 'DEV-C01', monto: 9990, ruta: 'APROBACION' } },\n  { json: { id_solicitud: 'DEV-C02', monto: 0, ruta: 'DATOS_INVALIDOS' } },\n  { json: { id_solicitud: 'DEV-C03', monto: 25000, ruta: 'RECHAZO' } },\n  { json: { id_solicitud: 'DEV-1122', monto: 45990, ruta: 'APROBACION' } },\n  { json: { id_solicitud: 'DEV-1123', monto: 12990, ruta: 'RECHAZO' } },\n  { json: { id_solicitud: 'DEV-1124', monto: 65990, ruta: 'REVISION' } },\n  { json: { id_solicitud: 'DEV-1125', monto: 19990, ruta: 'REVISION' } },\n  { json: { id_solicitud: 'DEV-1126', monto: 35990, ruta: 'RECHAZO' } },\n  { json: { id_solicitud: 'DEV-1127', monto: 50000, ruta: 'APROBACION' } },\n  { json: { id_solicitud: 'DEV-1128', monto: -5000, ruta: 'DATOS_INVALIDOS' } },\n  { json: { id_solicitud: 'DEV-1129', monto: 89990, ruta: 'RECHAZO' } },\n  { json: { id_solicitud: 'DEV-1130', monto: 15990, ruta: 'APROBACION' } },\n  { json: { id_solicitud: 'DEV-1131', monto: 52000, ruta: 'REVISION' } },\n  { json: { id_solicitud: 'DEV-1132', monto: 29990, ruta: 'APROBACION' } },\n  { json: { id_solicitud: 'DEV-1133', monto: 41990, ruta: 'RECHAZO' } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a7b0f88e-3dee-43c4-b53e-1df330c38f9e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "jandrade@usm.cl",
+        "subject": "Resumen diario",
+        "message": "=Ruta {{ $json.ruta }} \nCantidad {{ $json.count_id_solicitud }}\nMonto {{ $json.sum_monto }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "959e7e8b-c594-4e65-abed-8acfaad1ce44",
+      "name": "Send a message",
+      "webhookId": "9e55f7b8-6eb2-43fd-a178-8029a7fc994e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vhIlRq5e862kINKT",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "205cb136-765f-4ac4-8d66-59a901202c93",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b2543e3aaed358bff05b07dd2aa648c867b7a11b7a2198b137502970b01fd223"
+  },
+  "nodeGroups": [],
+  "id": "EvAEK8lPkCqNvVlY",
+  "tags": []
+}
